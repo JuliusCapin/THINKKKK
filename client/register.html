@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - THINK++</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            font-family: Arial, sans-serif;
+        }
+        input:focus { border-color: #E374F9; }
+        .form-group { text-align: left; display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 13px; color: #888; }
+        .error { color: red; font-size: 13px; display: none; }
+        .link { font-size: 13px; color: #888; }
+        .link a { color: #FF4800; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>THINK++</h1>
+        <p>Create an account</p>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter username" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Min. 6 characters" />
+        </div>
+        <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Re-enter password" />
+        </div>
+
+        <p class="error" id="errorBox"></p>
+
+        <div class="but">
+            <button onclick="register()">Register</button>
+        </div>
+        <p class="link">Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+
+    <script>
+        if (localStorage.getItem('token')) window.location.href = 'index.html';
+
+        async function register() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorBox = document.getElementById('errorBox');
+            errorBox.style.display = 'none';
+
+            if (!username || !password || !confirmPassword) {
+                errorBox.textContent = 'Please fill in all fields.';
+                errorBox.style.display = 'block';
+                return;
+            }
+            if (password !== confirmPassword) {
+                errorBox.textContent = 'Passwords do not match.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('username', data.username);
+                window.location.href = 'index.html';
+            } catch (err) {
+                errorBox.textContent = '⚠ ' + err.message;
+                errorBox.style.display = 'block';
+            }
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Enter') register(); });
+    </script>
+</body>
+</html>
