@@ -3,18 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>THINK++</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .user-bar {
+            font-size: 13px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .user-bar span { color: #FF4800; font-weight: bold; }
+        .logout-btn {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+            width: auto !important;
+        }
+        .logout-btn:hover { background: #f5f5f5; }
+    </style>
 </head>
 <body>
     <div class="card">
+        <div class="user-bar">
+            <p>👤 <span id="usernameDisplay"></span></p>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
         <h1>THINK++</h1>
         <p>A quiz app designed for comscie students only.</p>
         <div class="but">
-            <button onclick="location.href = 'about.html'">About</button>
-            <button onclick="location.href = 'difficulty.html'">Play</button>
-            <button onclick="location.href = 'upload.html'">Upload & Play</button>
+            <button onclick="location.href='about.html'">About</button>
+            <button onclick="location.href='difficulty.html'">Play</button>
+            <button onclick="location.href='upload.html'">Upload & Play</button>
+            <button onclick="location.href='leaderboard.html'">🏆 Leaderboard</button>
         </div>
     </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
+        document.getElementById('usernameDisplay').textContent = localStorage.getItem('username') || 'Player';
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            window.location.href = 'login.html';
+        }
+    </script>
 </body>
 </html>
