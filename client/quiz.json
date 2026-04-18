@@ -1,39 +1,171 @@
 {
         "easy": [
             {
-                "question": "2 + 2 = ?",
+                "question": "int numbers[5] = {10, 20, 30, 40, 50}; \n What is the value of numbers[2]?",
+                "options": ["10", "20", "30", "40"],
+                "correct": 2
+            },
+            {
+                "question": "int a = 5; \n int b = 10; \n What is the value of a + b?",
+                "options": ["15", "20", "25", "30"],
+                "correct": 0
+            },
+            {
+                "question": "Which of the following is not a programming language?",
+                "options": ["HTML", "Ruby", "JavaScript", "SQL"],
+                "correct": 0
+            },
+            {
+                "question": "What does HTML stand for?",
+                "options": [
+                    "Hyper Text Markup Language",
+                    "Home Tool Markup Language",
+                    "Hyperlinks and Text Markup Language",
+                    "Hyperlinking Text Marking Language"
+                ],
+                "correct": 0
+            },
+            {
+                "question": "int n = 5; a = n++; cout << a << endl; \n What is the value of a after this code executes?",
+                "options": ["4", "5", "6", "3"],
+                "correct": 2
+            },
+            {
+                "question": "What symbol is used to end a statement in C++?",
+                "options": [":", ";", ".", ","],
+                "correct": 1
+            },
+            {
+                "question": "which of the following is used to display output in C++?",
+                "options": ["cin", "cout", "print", "display"],
+                "correct": 1
+            },
+            {
+                "question": "What is the output of 2 + 2 in Python?",
                 "options": ["3", "4", "5", "6"],
                 "correct": 1
             },
             {
-                "question": "5 - 3 = ?",
-                "options": ["1", "2", "3", "4"],
+                "question": "Which symbol is used for input in C++?",
+                "options": ["cin", "cout", "scan", "print"],
+                "correct": 3
+            },
+            {
+                "question": "Which operator is used for assignment in C++?",
+                "options": ["=", "==", "=>", "<="],
+                "correct": 0
+            },
+            {
+                "question": "What will this code output? cout << 5 * 5",
+                "options": ["25", "55", "35", "15"],
+                "correct": 0
+            },
+            {
+                "question": "Which of the following is a data type in C++?",
+                "options": ["string", "integer", "boolean", "all of the above"],
+                "correct": 3
+            },
+            {
+                "question": "Which symbol is used for not equal to in C++?",
+                "options": ["!=", "==", "!==", "||"],
+                "correct": 0
+            },
+            {
+                "question": "What is the value of x? int x = 10;",
+                "options": ["0", "10", "x", "Error"],
                 "correct": 1
+            },
+            {
+                "question": "Which of the following is a conditional statement in programming?",
+                "options": ["if", "for", "while", "switch"],
+                "correct": 0
+            },
+            {
+                "question": "What is the output of 10 - 5 in Python?",
+                "options": ["3", "4", "5", "6"],
+                "correct": 2
+            },
+            {
+                "question": "Which data type is used for whole numbers?",
+                "options": ["int", "float", "double", "char"],
+                "correct": 0
+            },
+            {
+                "question": "Which is NOT a C++ keyword?",
+                "options": ["int", "float", "begin", "return"],
+                "correct": 2
+            },
+            {
+                "question": "C++ is a ________  language.",
+                "options": ["Human", "Music", "Programming", "Drawing"],
+                "correct": 2
             }
         ],
 
+
+
+
+
+
+
+
         "medium": [
             {
-                "question": "What does CSS stand for?",
-                "options": [
-                    "Computer Style Sheets",
-                    "Cascading Style Sheets",
-                    "Creative Style System",
-                    "Colorful Style Sheets"
-                ],
+                "question": "Which of the following is a loop structure in programming?",
+                "options": ["if", "else", "for", "switch"],
+                "correct": 2
+            },
+            {
+                "question": "Which of the following is a valid variable name in C++?",
+                "options": ["1variable", "variable_name", "variable-name", "variable name"],
                 "correct": 1
             },
             {
-                "question": "Which is a JavaScript framework?",
-                "options": ["Laravel", "React", "Django", "Flask"],
+                "question": "int x = 5; cout << x++ << ++x;",
+                "options": ["57", "67", "56", "Undefined behavior"],
+                "correct": 3
+            },
+            {
+                "question": "int i = 0; while (i++ < 3) cout << i;",
+                "options": ["1", "2 3 4", "0 1 2", "1 2 3"],
+                "correct": 3
+            },
+            {
+                "question": "Which access specifier is the default for a class in C++?",
+                "options": ["public", "protected", "private", "default"],
+                "correct": 2
+            },
+            {
+                "question": "What is the output? int a = 2; cout << (a << 2);",
+                "options": ["6", "9", "8", "16"],
+                "correct": 2
+            },
+            {
+                "question": "What keyword prevents a class from being inherited?",
+                "options": ["final", "const", "static", "virtual"],
+                "correct": 0
+            },
+            {
+                "question": "What is the output? int x = 5; int y = 10; cout << (x | y);",
+                "options": ["0", "5", "10", "15"],
+                "correct": 3
+            },
+            {
+                "question": "What is the output? int a = 5; int b = 3; cout << (a % b);",
+                "options": ["1.66", "1", "2", "0"],
                 "correct": 1
             },
             {
-                "question": "What is the output of 3 * 3 in Python?",
-                "options": ["6", "9", "12", "15"],
-                "correct": 1
+                "question": "What is the output? int x = 5; int y = 10; cout << (x ^ y);",
+                "options": ["0", "5", "10", "15"],
+                "correct": 3
             }
         ],
+
+
+
+
+
 
         "hard": [
             {
@@ -47,49 +179,90 @@
                 "correct"   : 1
             },
             {
-                "question": "What is the output of 2 ** 3 in Python?",
-                "options": ["5", "6", "8", "9"],
-                "correct": 2
+                "question": "What is main() in C++?",
+                "options": ["A variable", "A function", "A library", "A loop"],
+                "correct": 1
             },
             {
-                "question": "Which of the following is not a programming language?",
-                "options": ["Python", "Java", "HTML", "C++"],
-                "correct": 2
+                "question": "What does the explicit keyword do when applied to a constructor in C++?",
+                "options": ["Prevents implicit conversions", "Makes the constructor public", "Makes the constructor private", "Has no effect"],
+                "correct": 0
             },  
             {
-                "question": "What does SQL stand for?",
+                "question": "What is a dangling pointer in C++?",
                 "options": [
-                    "Structured Query Language",
-                    "Simple Query Language",
-                    "Sequential Query Language",
-                    "Standard Query Language"
+                    "A pointer that points to a deallocated memory location",
+                    "A pointer that points to the beginning of an array",
+                    "A pointer that points to the end of an array",
+                    "A pointer that is not initialized"
                 ],
                 "correct": 0
             },
             {
-                "question": "Which of the following is a NoSQL database?",
-                "options": ["MySQL", "MongoDB", "PostgreSQL", "SQLite"],
-                "correct": 1
-            },
-            {
-                "question": "What is the output of 5 % 2 in Python?",
-                "options": ["0", "1", "2", "3"],
-                "correct": 1
-            },
-            {
-                "question": "Which of the following is not a programming paradigm?",
-                "options": ["Object-oriented", "Functional", "Procedural", "Graphical"],
-                "correct": 3
-            },
-            {
-                "question": "What is the output of 10 // 3 in Python?",
-                "options": ["3", "3.33", "4", "5"],
+                "question": "What is the output? int x = 5; int y = x > 3 ? x : 3; cout << y;",
+                "options": ["5", "3", "8", "10"],
                 "correct": 0
             },
             {
-                "question": "Which of the following is not a data structure?",
-                "options": ["Array", "Linked List", "Stack", "Algorithm"],
-                "correct": 3
+                "question": "What is function overloading in C++?",
+                "options": ["Calling a function more times than allowed", "Declaring a function with no parameters", "Defining multiple functions with the same name but different parameters", "Declaring a function with a default parameter"],
+                "correct": 2
+            },
+            {
+                "question": "What is the purpose of the this pointer in C++?",
+                "options": [
+                    "It points to the base class of the current object", 
+                    "It points to the current object instance inside a member function", 
+                    "To access global variables", 
+                    "To access local variables"],
+                "correct": 1
+            },
+            {
+                "question": "Which of the following best describes polymorphism in C++?",
+                "options": [
+                    "The ability to create multiple objects from one class", 
+                    "The ability to inherit properties from a base class", 
+                    "The ability for a single interface to represent different underlying types at runtime", 
+                    "The ability to overload operators"],
+                "correct": 2
+            },
+            {
+                "question": "What is an abstract class in C++?",
+                "options": [
+                    "A class with no member functions", 
+                    "A class that cannot have constructors", 
+                    "A class with at least one pure virtual function, which cannot be instantiated directly", 
+                    "A class that only contains static members"],
+                "correct": 2
+            },
+            {
+                "question": "What is the output? int a = 10; int b = 20; cout << (a & b);",
+                "options": ["0", "10", "20", "30"],
+                "correct": 0
+            },
+            {
+                "question": "What is the purpose of the virtual keyword in C++?",
+                "options": [
+                    "To indicate that a function can be overridden in derived classes and supports dynamic dispatch", 
+                    "To make a function inline", 
+                    "To prevent a function from being overridden", 
+                    "To indicate that a function is static"],
+                "correct": 0
+            },
+            {
+                "question": "What is the output? int x = 5; int y = 10; cout << (x > y ? x : y);",
+                "options": ["5", "10", "15", "0"],
+                "correct": 1
+            },
+            {
+                "question": "What is the output? int a = 5; int b = 3; cout << (a / b);",
+                "options": ["1.66", "1", "2", "0"],
+                "correct": 1
+            },
+            {
+                "question": "What is the output? int x = 5; int y = 10; cout << (x & y);",
+                "options": ["0", "5", "10", "15"],
+                "correct": 0
             }
         ]
     }
