@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Quiz Problem</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="apple-touch-icon.png">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -35,34 +34,55 @@
         gap: 16px;
     }
 
-    .question-wrap {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+    .difficulty-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.3s;
+    }
+    .badge-easy { background: #4CAF50; color: white; }
+    .badge-medium { background: #FF9800; color: white; }
+    .badge-hard { background: #f44336; color: white; }
+
+    .difficulty-change {
+        font-size: 13px;
+        font-weight: bold;
+        padding: 8px 12px;
+        border-radius: 8px;
+        animation: popIn 0.4s ease;
+        display: none;
+    }
+    .up { background: #fff3cd; color: #856404; }
+    .down { background: #d1ecf1; color: #0c5460; }
+
+    @keyframes popIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
     }
 
-    /* Plain text label e.g. "What is the output?" */
     #questionLabel {
         font-size: 16px;
         line-height: 1.5;
-        display: none; /* shown only when there's a label part */
+        display: none;
     }
 
-    /* Code block for the snippet */
     #questionCode {
         background: #1e1e1e;
         color: #d4d4d4;
-        font-family: 'Courier New', Courier, monospace;
+        font-family: 'Courier New', monospace;
         font-size: 14px;
         padding: 14px 16px;
         border-radius: 10px;
         text-align: left;
         white-space: pre;
-        display: none; /* shown only when there's a code part */
+        display: none;
         overflow-x: auto;
     }
 
-    /* Fallback: plain question with no code */
     #questionText {
         font-size: 16px;
         line-height: 1.5;
@@ -106,12 +126,26 @@
         visibility: hidden;
     }
 
+    .progress-bar-wrap {
+        background: #ddd;
+        border-radius: 10px;
+        height: 8px;
+        width: 70%;
+    }
+
+    .progress-bar {
+        height: 8px;
+        border-radius: 10px;
+        background: #FF4800;
+        transition: width 0.4s ease;
+    }
+
     .finalResult {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 16px;
-        font-size: 22px;
+        font-size: 20px;
         font-weight: bold;
     }
 
@@ -131,37 +165,65 @@
         cursor: pointer;
         font-size: 15px;
     }
+
+    .summary {
+        font-size: 13px;
+        color: #555;
+        font-weight: normal;
+        line-height: 1.8;
+    }
 </style>
 </head>
 <body>
 
-<p class="title" id="problemNumber">Problem 1</p>
+<p class="title" id="problemNumber">Problem 1 of 10</p>
 
 <div class="card">
     <div class="quizContent">
-        <div class="question-wrap">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="difficulty-badge badge-easy" id="diffBadge">Easy</span>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar" id="progressBar" style="width:0%"></div>
+            </div>
+        </div>
+
+        <div class="difficulty-change" id="diffChange"></div>
+
+        <div>
             <p id="questionLabel"></p>
             <pre id="questionCode"></pre>
             <p id="questionText"></p>
         </div>
+
         <div class="but">
             <button onclick="checkAnswer(0)" id="btn0"></button>
             <button onclick="checkAnswer(1)" id="btn1"></button>
             <button onclick="checkAnswer(2)" id="btn2"></button>
             <button onclick="checkAnswer(3)" id="btn3"></button>
         </div>
+
         <p class="result" id="result"></p>
-        <button class="next-btn" id="bbtn" onclick="nextQuestion()">Next</button>
+        <button class="next-btn" id="bbtn" onclick="nextQuestion()">Next →</button>
     </div>
-    <div class="finalResult" style="display: none;"></div>
+    <div class="finalResult" style="display:none;"></div>
 </div>
 
 <script>
     const MAX_QUESTIONS = 10;
-    const difficulty = localStorage.getItem("difficulty") || "easy";
-    let selectedQuiz = [];
-    let currentQuestion = 0;
+    const LEVELS = ['easy', 'medium', 'hard'];
+
+    const startDifficulty = localStorage.getItem("difficulty") || "easy";
+    const uploadedQuiz = localStorage.getItem("uploadedQuiz");
+
+    let allQuestions = {};
+    let usedIndexes = { easy: new Set(), medium: new Set(), hard: new Set() };
+    let currentDifficulty = startDifficulty;
+
+    let questionHistory = [];
+    let currentQuestion = null;
+    let questionCount = 0;
     let score = 0;
+    let streak = 0;
 
     const questionLabel = document.getElementById("questionLabel");
     const questionCode  = document.getElementById("questionCode");
@@ -169,121 +231,134 @@
     const problemNumber = document.getElementById("problemNumber");
     const result        = document.getElementById("result");
     const buttons       = document.querySelectorAll(".but button");
-    const uploadedQuiz  = localStorage.getItem("uploadedQuiz");
+    const diffBadge     = document.getElementById("diffBadge");
+    const diffChange    = document.getElementById("diffChange");
+    const progressBar   = document.getElementById("progressBar");
 
-    // Fisher-Yates shuffle
-    function shuffle(arr) {
-        const a = [...arr];
-        for (let i = a.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [a[i], a[j]] = [a[j], a[i]];
+    function updateBadge(diff) {
+        diffBadge.textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
+        diffBadge.className = 'difficulty-badge badge-' + diff;
+    }
+
+    function showDifficultyChange(msg, type) {
+        diffChange.textContent = msg;
+        diffChange.className = 'difficulty-change ' + type;
+        diffChange.style.display = 'block';
+        setTimeout(() => { diffChange.style.display = 'none'; }, 2500);
+    }
+
+    function getNextQuestion() {
+        const pool = allQuestions[currentDifficulty];
+        if (!pool || pool.length === 0) return null;
+
+        const unused = pool.map((q, i) => i).filter(i => !usedIndexes[currentDifficulty].has(i));
+
+        if (unused.length === 0) {
+            usedIndexes[currentDifficulty].clear();
+            return getNextQuestion();
         }
-        return a;
+
+        const idx = unused[Math.floor(Math.random() * unused.length)];
+        usedIndexes[currentDifficulty].add(idx);
+        return { ...pool[idx], difficulty: currentDifficulty };
     }
 
-    function prepareQuiz(questions) {
-        const shuffled = shuffle(questions);
-        return shuffled.slice(0, MAX_QUESTIONS);
+    function adjustDifficulty(wasCorrect) {
+        streak = wasCorrect ? (streak > 0 ? streak + 1 : 1) : (streak < 0 ? streak - 1 : -1);
+
+        const currentLevel = LEVELS.indexOf(currentDifficulty);
+
+        if (streak >= 3 && currentLevel < 2) {
+            currentDifficulty = LEVELS[currentLevel + 1];
+            streak = 0;
+            updateBadge(currentDifficulty);
+            showDifficultyChange('Nice streak! Moving to ' + currentDifficulty, 'up');
+        } else if (streak <= -2 && currentLevel > 0) {
+            currentDifficulty = LEVELS[currentLevel - 1];
+            streak = 0;
+            updateBadge(currentDifficulty);
+            showDifficultyChange('Adjusting to ' + currentDifficulty, 'down');
+        }
     }
 
-    if (difficulty === "uploaded" && uploadedQuiz) {
-        const parsed = JSON.parse(uploadedQuiz);
-        const mapped = parsed.map(q => ({
-            question: q.question,
-            options: q.options.map(o => o.replace(/^[A-D]\)\s*/, '')),
-            correct: ['A','B','C','D'].indexOf(q.answer) !== -1 ? ['A','B','C','D'].indexOf(q.answer) : 0
-        }));
-        selectedQuiz = prepareQuiz(mapped);
-        loadQuestion();
-    } else {
-        fetch("quiz.json")
-            .then(r => r.json())
-            .then(data => {
-                selectedQuiz = prepareQuiz(data[difficulty]);
-                loadQuestion();
-            })
-            .catch(e => console.error(e));
-    }
-
-    function renderQuestion(rawQuestion) {
-        // Hide all by default
+    function renderQuestion(q) {
         questionLabel.style.display = 'none';
         questionCode.style.display  = 'none';
         questionText.style.display  = 'none';
 
-        // If question contains \n, split into label + code
-        if (rawQuestion.includes('\n')) {
-            const parts = rawQuestion.split('\n');
-            // Lines that look like code (have operators, semicolons, etc.)
-            const codeLines = [];
-            const labelLines = [];
+        const raw = q.question;
 
+        if (raw.includes('\n')) {
+            const parts = raw.split('\n');
+            const codeLines = [], labelLines = [];
             parts.forEach(line => {
-                const trimmed = line.trim();
-                // Heuristic: code lines have C++ patterns
-                if (/[{};=<>!+\-*/%]/.test(trimmed) || /^\s*(int|float|double|char|string|cout|cin|for|while|if)\b/.test(trimmed)) {
-                    codeLines.push(trimmed);
-                } else if (trimmed.length > 0) {
-                    labelLines.push(trimmed);
+                const t = line.trim();
+                if (/[{};=<>!+\-*/%]/.test(t) || /^\s*(int|float|double|char|string|cout|cin|for|while|if)\b/.test(t)) {
+                    codeLines.push(t);
+                } else if (t.length > 0) {
+                    labelLines.push(t);
                 }
             });
-
-            if (codeLines.length > 0) {
-                questionCode.textContent = codeLines.join('\n');
-                questionCode.style.display = 'block';
-            }
-            if (labelLines.length > 0) {
-                questionLabel.textContent = labelLines.join(' ');
-                questionLabel.style.display = 'block';
-            }
+            if (codeLines.length) { questionCode.textContent = codeLines.join('\n'); questionCode.style.display = 'block'; }
+            if (labelLines.length) { questionLabel.textContent = labelLines.join(' '); questionLabel.style.display = 'block'; }
         } else {
-            // Plain question, no code
-            questionText.textContent = rawQuestion;
+            questionText.textContent = raw;
             questionText.style.display = 'block';
         }
     }
 
     function loadQuestion() {
-        const current = selectedQuiz[currentQuestion];
-        if (!current) return;
+        currentQuestion = getNextQuestion();
+        if (!currentQuestion) return;
 
-        problemNumber.textContent = "Problem " + (currentQuestion + 1) + " of " + selectedQuiz.length;
-        renderQuestion(current.question);
+        questionCount++;
+        problemNumber.textContent = 'Problem ' + questionCount + ' of ' + MAX_QUESTIONS;
+        progressBar.style.width = ((questionCount - 1) / MAX_QUESTIONS * 100) + '%';
+        updateBadge(currentDifficulty);
+        renderQuestion(currentQuestion);
 
         for (let i = 0; i < 4; i++) {
-            buttons[i].textContent = String.fromCharCode(65 + i) + ". " + (current.options[i] || "");
+            buttons[i].textContent = String.fromCharCode(65 + i) + '. ' + (currentQuestion.options[i] || '');
             buttons[i].disabled = false;
-            buttons[i].style.backgroundColor = "white";
+            buttons[i].style.backgroundColor = 'white';
         }
-        result.textContent = "";
-        document.getElementById("bbtn").style.visibility = "hidden";
+
+        result.textContent = '';
+        document.getElementById('bbtn').style.visibility = 'hidden';
     }
 
     function checkAnswer(selected) {
-        const correctIndex = selectedQuiz[currentQuestion].correct;
-        if (selected === correctIndex) {
-            result.textContent = "Correct!";
-            result.style.color = "green";
-            buttons[selected].style.backgroundColor = "#4CAF50";
+        const correctIndex = currentQuestion.correct;
+        const wasCorrect = selected === correctIndex;
+
+        if (wasCorrect) {
+            result.textContent = 'Correct!';
+            result.style.color = 'green';
+            buttons[selected].style.backgroundColor = '#4CAF50';
             score++;
         } else {
-            result.textContent = "Wrong!";
-            result.style.color = "red";
-            buttons[selected].style.backgroundColor = "#f44336";
-            buttons[correctIndex].style.backgroundColor = "#4CAF50";
+            result.textContent = 'Wrong!';
+            result.style.color = 'red';
+            buttons[selected].style.backgroundColor = '#f44336';
+            buttons[correctIndex].style.backgroundColor = '#4CAF50';
         }
-        document.getElementById("bbtn").style.visibility = "visible";
+
+        questionHistory.push({ correct: wasCorrect, difficulty: currentQuestion.difficulty });
+        adjustDifficulty(wasCorrect);
+        document.getElementById('bbtn').style.visibility = 'visible';
         buttons.forEach(btn => btn.disabled = true);
     }
 
     function nextQuestion() {
-        currentQuestion++;
-        if (currentQuestion < selectedQuiz.length) loadQuestion();
-        else showFinalResult();
+        if (questionCount >= MAX_QUESTIONS) {
+            showFinalResult();
+        } else {
+            loadQuestion();
+        }
     }
 
     async function saveScore() {
-        if (difficulty === 'uploaded') return;
+        if (startDifficulty === 'uploaded') return;
         const token = localStorage.getItem('token');
         if (!token) return;
         try {
@@ -293,7 +368,7 @@
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + token
                 },
-                body: JSON.stringify({ score, total: selectedQuiz.length, difficulty })
+                body: JSON.stringify({ score, total: MAX_QUESTIONS, difficulty: startDifficulty })
             });
         } catch (err) {
             console.error('Failed to save score:', err);
@@ -302,23 +377,57 @@
 
     function showFinalResult() {
         saveScore();
-        document.querySelector(".quizContent").style.display = "none";
-        const finalDiv = document.querySelector(".finalResult");
-        finalDiv.style.display = "flex";
-        finalDiv.innerHTML = `
-            <p>Your final score is:<br>${score}/${selectedQuiz.length}</p>
-            <div class="btn-row">
-                <button onclick="restartQuiz()">Restart Quiz</button>
-                <button onclick="location.href='leaderboard.html'">🏆 Leaderboard</button>
-                <button onclick="location.href='index.html'">Main Menu</button>
-            </div>
-        `;
+        progressBar.style.width = '100%';
+
+        const breakdown = { easy: {c:0,t:0}, medium: {c:0,t:0}, hard: {c:0,t:0} };
+        questionHistory.forEach(h => {
+            breakdown[h.difficulty].t++;
+            if (h.correct) breakdown[h.difficulty].c++;
+        });
+
+        const breakdownHTML = Object.entries(breakdown)
+            .filter(([,v]) => v.t > 0)
+            .map(([k,v]) => k.charAt(0).toUpperCase() + k.slice(1) + ': ' + v.c + '/' + v.t)
+            .join(' | ');
+
+        document.querySelector('.quizContent').style.display = 'none';
+        const finalDiv = document.querySelector('.finalResult');
+        finalDiv.style.display = 'flex';
+        finalDiv.innerHTML =
+            '<p>Your final score is:<br>' + score + '/' + MAX_QUESTIONS + '</p>' +
+            '<p class="summary">' + breakdownHTML + '</p>' +
+            '<div class="btn-row">' +
+                '<button onclick="restartQuiz()">Play Again</button>' +
+                '<button onclick="location.href=\'leaderboard.html\'">🏆 Leaderboard</button>' +
+                '<button onclick="location.href=\'index.html\'">Main Menu</button>' +
+            '</div>';
     }
 
     function restartQuiz() {
-        localStorage.removeItem("uploadedQuiz");
-        localStorage.removeItem("difficulty");
-        window.location.href = "difficulty.html";
+        localStorage.removeItem('uploadedQuiz');
+        localStorage.removeItem('difficulty');
+        window.location.href = 'difficulty.html';
+    }
+
+    // Init
+    if (startDifficulty === 'uploaded' && uploadedQuiz) {
+        const parsed = JSON.parse(uploadedQuiz);
+        const mapped = parsed.map(q => ({
+            question: q.question,
+            options: q.options.map(o => o.replace(/^[A-D]\)\s*/, '')),
+            correct: ['A','B','C','D'].indexOf(q.answer) !== -1 ? ['A','B','C','D'].indexOf(q.answer) : 0
+        }));
+        allQuestions = { easy: mapped, medium: mapped, hard: mapped };
+        currentDifficulty = 'easy';
+        loadQuestion();
+    } else {
+        fetch('quiz.json')
+            .then(r => r.json())
+            .then(data => {
+                allQuestions = data;
+                loadQuestion();
+            })
+            .catch(e => console.error(e));
     }
 </script>
 </body>
