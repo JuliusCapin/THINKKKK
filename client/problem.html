@@ -4,122 +4,151 @@
     <meta charset="UTF-8">
     <title>Quiz Problem</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-    *{
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body{
+    body {
         background: linear-gradient(to bottom, #E374F9, #F8D8F8);
-        background-repeat: no-repeat;
-        height: 100vh;
+        min-height: 100vh;
         font-family: Arial, sans-serif;
+        padding: 20px;
     }
 
-    .title{
+    .title {
         text-align: center;
-        margin-top: 20px;
+        margin-bottom: 16px;
         font-weight: bold;
+        font-size: 18px;
     }
 
-    .card{
+    .card {
         background-color: #e9e9e9;
-        position: absolute;
-        width: 90%;
+        width: 100%;
         max-width: 600px;
-        padding: 60px 40px;
+        margin: 0 auto;
+        padding: 30px 20px;
         border-radius: 15px;
         text-align: center;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        height: 70%;
+        gap: 16px;
     }
 
-    .but{
+    .question-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Plain text label e.g. "What is the output?" */
+    #questionLabel {
+        font-size: 16px;
+        line-height: 1.5;
+        display: none; /* shown only when there's a label part */
+    }
+
+    /* Code block for the snippet */
+    #questionCode {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        padding: 14px 16px;
+        border-radius: 10px;
+        text-align: left;
+        white-space: pre;
+        display: none; /* shown only when there's a code part */
+        overflow-x: auto;
+    }
+
+    /* Fallback: plain question with no code */
+    #questionText {
+        font-size: 16px;
+        line-height: 1.5;
+        display: none;
+    }
+
+    .but {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap:20px;
-        margin-top: 20px;
+        gap: 12px;
     }
 
-    .but button{
+    .but button {
         background-color: white;
-        padding: 20px;
+        padding: 16px 10px;
         border: none;
         border-radius: 10px;
         cursor: pointer;
-        transition: 0.3s;
-        font-size: 14px;
-    }
-
-    .but button:hover{
-        background-color: #ddd;
-    }
-
-    .result{
-        margin-top: 15px;
-        font-weight: bold;
-    }
-
-    .next-btn{
+        transition: 0.2s;
+        font-size: 13px;
+        line-height: 1.4;
+        min-height: 60px;
+        display: flex;
         align-items: center;
-        margin-top: 15px;
-        padding: 10px;
+        justify-content: center;
+        word-break: break-word;
+    }
+
+    .but button:hover { background-color: #ddd; }
+    .result { font-weight: bold; font-size: 16px; }
+
+    .next-btn {
+        padding: 14px;
         border: none;
         width: 100%;
         border-radius: 8px;
         background-color: #FF4800;
         color: white;
         cursor: pointer;
+        font-size: 16px;
         visibility: hidden;
     }
 
     .finalResult {
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
-        gap: 15px;
-        font-size: 24px;
+        gap: 16px;
+        font-size: 22px;
         font-weight: bold;
     }
 
+    .btn-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
     .finalResult button {
-        padding: 15px 25px;
+        padding: 14px 24px;
         background-color: #FF4800;
         border: none;
         border-radius: 15px;
         color: white;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 15px;
     }
 </style>
 </head>
-
 <body>
 
 <p class="title" id="problemNumber">Problem 1</p>
 
 <div class="card">
     <div class="quizContent">
-        <div>
+        <div class="question-wrap">
+            <p id="questionLabel"></p>
+            <pre id="questionCode"></pre>
             <p id="questionText"></p>
         </div>
-
         <div class="but">
             <button onclick="checkAnswer(0)" id="btn0"></button>
             <button onclick="checkAnswer(1)" id="btn1"></button>
             <button onclick="checkAnswer(2)" id="btn2"></button>
             <button onclick="checkAnswer(3)" id="btn3"></button>
         </div>
-
         <p class="result" id="result"></p>
         <button class="next-btn" id="bbtn" onclick="nextQuestion()">Next</button>
     </div>
@@ -127,67 +156,110 @@
 </div>
 
 <script>
+    const MAX_QUESTIONS = 10;
     const difficulty = localStorage.getItem("difficulty") || "easy";
-
-    const selectedQuiz = [];
+    let selectedQuiz = [];
     let currentQuestion = 0;
     let score = 0;
 
-    const questionText = document.getElementById("questionText");
+    const questionLabel = document.getElementById("questionLabel");
+    const questionCode  = document.getElementById("questionCode");
+    const questionText  = document.getElementById("questionText");
     const problemNumber = document.getElementById("problemNumber");
-    const result = document.getElementById("result");
-    const buttons = document.querySelectorAll(".but button");
+    const result        = document.getElementById("result");
+    const buttons       = document.querySelectorAll(".but button");
+    const uploadedQuiz  = localStorage.getItem("uploadedQuiz");
 
-    const uploadedQuiz = localStorage.getItem("uploadedQuiz");
+    // Fisher-Yates shuffle
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function prepareQuiz(questions) {
+        const shuffled = shuffle(questions);
+        return shuffled.slice(0, MAX_QUESTIONS);
+    }
 
     if (difficulty === "uploaded" && uploadedQuiz) {
         const parsed = JSON.parse(uploadedQuiz);
-        parsed.forEach(q => {
-            // Strip "A) " prefix from options if present
-            const cleanOptions = q.options.map(o => o.replace(/^[A-D]\)\s*/, ''));
-            // Get correct index from answer letter
-            const correctIndex = ['A','B','C','D'].indexOf(q.answer);
-            selectedQuiz.push({
-                question: q.question,
-                options: cleanOptions,
-                correct: correctIndex !== -1 ? correctIndex : 0
-            });
-        });
+        const mapped = parsed.map(q => ({
+            question: q.question,
+            options: q.options.map(o => o.replace(/^[A-D]\)\s*/, '')),
+            correct: ['A','B','C','D'].indexOf(q.answer) !== -1 ? ['A','B','C','D'].indexOf(q.answer) : 0
+        }));
+        selectedQuiz = prepareQuiz(mapped);
         loadQuestion();
     } else {
         fetch("quiz.json")
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
-                selectedQuiz.push(...data[difficulty]);
+                selectedQuiz = prepareQuiz(data[difficulty]);
                 loadQuestion();
             })
-            .catch(error => console.error("Error loading quiz data:", error));
+            .catch(e => console.error(e));
+    }
+
+    function renderQuestion(rawQuestion) {
+        // Hide all by default
+        questionLabel.style.display = 'none';
+        questionCode.style.display  = 'none';
+        questionText.style.display  = 'none';
+
+        // If question contains \n, split into label + code
+        if (rawQuestion.includes('\n')) {
+            const parts = rawQuestion.split('\n');
+            // Lines that look like code (have operators, semicolons, etc.)
+            const codeLines = [];
+            const labelLines = [];
+
+            parts.forEach(line => {
+                const trimmed = line.trim();
+                // Heuristic: code lines have C++ patterns
+                if (/[{};=<>!+\-*/%]/.test(trimmed) || /^\s*(int|float|double|char|string|cout|cin|for|while|if)\b/.test(trimmed)) {
+                    codeLines.push(trimmed);
+                } else if (trimmed.length > 0) {
+                    labelLines.push(trimmed);
+                }
+            });
+
+            if (codeLines.length > 0) {
+                questionCode.textContent = codeLines.join('\n');
+                questionCode.style.display = 'block';
+            }
+            if (labelLines.length > 0) {
+                questionLabel.textContent = labelLines.join(' ');
+                questionLabel.style.display = 'block';
+            }
+        } else {
+            // Plain question, no code
+            questionText.textContent = rawQuestion;
+            questionText.style.display = 'block';
+        }
     }
 
     function loadQuestion() {
         const current = selectedQuiz[currentQuestion];
+        if (!current) return;
 
-        if (!current) {
-            console.error("No question found at index", currentQuestion);
-            return;
-        }
-
-        problemNumber.textContent = "Problem " + (currentQuestion + 1);
-        questionText.textContent = current.question;
+        problemNumber.textContent = "Problem " + (currentQuestion + 1) + " of " + selectedQuiz.length;
+        renderQuestion(current.question);
 
         for (let i = 0; i < 4; i++) {
             buttons[i].textContent = String.fromCharCode(65 + i) + ". " + (current.options[i] || "");
             buttons[i].disabled = false;
             buttons[i].style.backgroundColor = "white";
         }
-
         result.textContent = "";
         document.getElementById("bbtn").style.visibility = "hidden";
     }
 
     function checkAnswer(selected) {
         const correctIndex = selectedQuiz[currentQuestion].correct;
-
         if (selected === correctIndex) {
             result.textContent = "Correct!";
             result.style.color = "green";
@@ -199,28 +271,44 @@
             buttons[selected].style.backgroundColor = "#f44336";
             buttons[correctIndex].style.backgroundColor = "#4CAF50";
         }
-
         document.getElementById("bbtn").style.visibility = "visible";
         buttons.forEach(btn => btn.disabled = true);
     }
 
     function nextQuestion() {
         currentQuestion++;
-        if (currentQuestion < selectedQuiz.length) {
-            loadQuestion();
-        } else {
-            showFinalResult();
+        if (currentQuestion < selectedQuiz.length) loadQuestion();
+        else showFinalResult();
+    }
+
+    async function saveScore() {
+        if (difficulty === 'uploaded') return;
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        try {
+            await fetch('/api/auth/score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ score, total: selectedQuiz.length, difficulty })
+            });
+        } catch (err) {
+            console.error('Failed to save score:', err);
         }
     }
 
     function showFinalResult() {
+        saveScore();
         document.querySelector(".quizContent").style.display = "none";
         const finalDiv = document.querySelector(".finalResult");
         finalDiv.style.display = "flex";
         finalDiv.innerHTML = `
-            <p>Your final score is: ${score}/${selectedQuiz.length}</p>
-            <div style="display:flex; gap:10px;">
+            <p>Your final score is:<br>${score}/${selectedQuiz.length}</p>
+            <div class="btn-row">
                 <button onclick="restartQuiz()">Restart Quiz</button>
+                <button onclick="location.href='leaderboard.html'">🏆 Leaderboard</button>
                 <button onclick="location.href='index.html'">Main Menu</button>
             </div>
         `;
@@ -232,6 +320,5 @@
         window.location.href = "difficulty.html";
     }
 </script>
-
 </body>
 </html>
