@@ -81,11 +81,6 @@
                 "correct": 0
             },
             {
-                "question": "What is the output of 10 - 5 in Python?",
-                "options": ["3", "4", "5", "6"],
-                "correct": 2
-            },
-            {
                 "question": "Which data type is used for whole numbers?",
                 "options": ["int", "float", "double", "char"],
                 "correct": 0
@@ -159,7 +154,11 @@
                 "question": "What is the output? int x = 5; int y = 10; cout << (x ^ y);",
                 "options": ["0", "5", "10", "15"],
                 "correct": 3
-            }
+            },
+            {
+                "questions": "what is the output? a = 10; b = 20; c = a + b; cout << a;",
+                "options": ["10", "0", 20", "30"],
+                "correct": 0
         ],
 
 
