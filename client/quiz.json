@@ -159,6 +159,7 @@
                 "questions": "what is the output? a = 10; b = 20; c = a + b; cout << a;",
                 "options": ["10", "0", 20", "30"],
                 "correct": 0
+            }
         ],
 
 
