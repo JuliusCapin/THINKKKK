@@ -24,15 +24,13 @@
             border-bottom: 1px solid #eee;
         }
         tr:nth-child(even) { background-color: #f9f9f9; }
-        tr:first-child td { font-weight: bold; color: #FF4800; }
         .rank { font-weight: bold; }
         .empty { color: #aaa; font-size: 13px; padding: 20px; }
-        .medal { font-size: 18px; }
     </style>
 </head>
 <body>
     <div class="card" style="gap: 16px;">
-        <h1>🏆 Leaderboard</h1>
+        <h1>Leaderboard</h1>
         <p>Top 10 scores from quiz battles</p>
 
         <table id="leaderboardTable">
@@ -63,7 +61,7 @@
                 const scores = await res.json();
                 const tbody = document.getElementById('leaderboardBody');
 
-                if (!scores.length) {
+                if (!Array.isArray(scores) || scores.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="4" class="empty">No scores yet. Be the first!</td></tr>';
                     return;
                 }
@@ -77,6 +75,7 @@
                     </tr>
                 `).join('');
             } catch (err) {
+                console.error('Leaderboard error:', err);
                 document.getElementById('leaderboardBody').innerHTML =
                     '<tr><td colspan="4" class="empty">Failed to load leaderboard.</td></tr>';
             }
