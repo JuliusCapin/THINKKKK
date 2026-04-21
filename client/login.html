@@ -44,10 +44,10 @@
             <button onclick="login()">Login</button>
         </div>
         <p class="link">No account? <a href="register.html">Register here</a></p>
+        <p style="font-size: 11px; color: #aaa; margin-top: 4px;">Do not use personal information. This is just a small project.</p>
     </div>
 
     <script>
-        // Redirect if already logged in
         if (localStorage.getItem('token')) window.location.href = 'index.html';
 
         async function login() {
@@ -80,7 +80,6 @@
             }
         }
 
-        // Allow Enter key
         document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
     </script>
 </body>
