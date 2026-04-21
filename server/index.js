@@ -15,7 +15,7 @@ app.use('/api', quizRoute);
 app.use('/api/auth', authRoute);
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/index.html'));
+    res.sendFile(path.join(__dirname, '../client/login.html'));
 });
 
 mongoose.connect(process.env.MONGODB_URI)
