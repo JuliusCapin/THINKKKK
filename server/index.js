@@ -21,12 +21,14 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrcAttr: ["'unsafe-inline'"],          // ← ADD THIS LINE
+      scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "blob:"],
       connectSrc: ["'self'"],
       fontSrc: ["'self'", "data:"],
       objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],              // ← clickjacking protection
+      upgradeInsecureRequests: [],
     },
   },
   frameguard: { action: 'deny' },
@@ -37,7 +39,11 @@ app.use(helmet({
     preload: true,
   },
   hidePoweredBy: true,
-  referrerPolicy: { policy: 'no-referrer' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  crossOriginOpenerPolicy: { policy: 'same-origin' },      // ← COOP
+  crossOriginResourcePolicy: { policy: 'same-origin' },    // ← CORP
+  crossOriginEmbedderPolicy: false,    // ← keep false or it'll break your API calls
+  permittedCrossDomainPolicies: { permittedPolicies: 'none' },
 }));
 
 app.use(express.json());
