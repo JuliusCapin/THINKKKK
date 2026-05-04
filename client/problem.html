@@ -11,14 +11,63 @@
         background: linear-gradient(to bottom, #E374F9, #F8D8F8);
         min-height: 100vh;
         font-family: Arial, sans-serif;
-        padding: 20px;
+        padding: 24px 16px;
     }
 
-    .title {
-        text-align: center;
-        margin-bottom: 16px;
+    .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 600px;
+        margin: 0 auto 16px;
+    }
+
+    .problem-title {
         font-weight: bold;
-        font-size: 18px;
+        font-size: 16px;
+    }
+
+    .diff-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+    .badge-easy   { background: #4CAF50; color: white; }
+    .badge-medium { background: #FF9800; color: white; }
+    .badge-hard   { background: #f44336; color: white; }
+
+    .progress-wrap {
+        max-width: 600px;
+        margin: 0 auto 16px;
+        background: rgba(255,255,255,0.35);
+        border-radius: 100px;
+        height: 6px;
+    }
+    .progress-bar {
+        height: 6px;
+        border-radius: 100px;
+        background: #FF4800;
+        transition: width 0.4s ease;
+    }
+
+    .diff-toast {
+        display: none;
+        font-size: 13px;
+        font-weight: bold;
+        padding: 8px 14px;
+        border-radius: 10px;
+        margin-bottom: 4px;
+        animation: popIn 0.3s ease;
+    }
+    .toast-up   { background: #fff9c4; color: #7a5c00; }
+    .toast-down { background: #d9f0ff; color: #005f8e; }
+
+    @keyframes popIn {
+        from { transform: scale(0.9); opacity: 0; }
+        to   { transform: scale(1);   opacity: 1; }
     }
 
     .card {
@@ -26,176 +75,187 @@
         width: 100%;
         max-width: 600px;
         margin: 0 auto;
-        padding: 30px 20px;
+        padding: 24px 20px;
         border-radius: 15px;
-        text-align: center;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 14px;
     }
 
-    .difficulty-badge {
-        display: inline-block;
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        transition: all 0.3s;
-    }
-    .badge-easy { background: #4CAF50; color: white; }
-    .badge-medium { background: #FF9800; color: white; }
-    .badge-hard { background: #f44336; color: white; }
-
-    .difficulty-change {
-        font-size: 13px;
-        font-weight: bold;
-        padding: 8px 12px;
-        border-radius: 8px;
-        animation: popIn 0.4s ease;
-        display: none;
-    }
-    .up { background: #fff3cd; color: #856404; }
-    .down { background: #d1ecf1; color: #0c5460; }
-
-    @keyframes popIn {
-        from { transform: scale(0.8); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
-
+    /* Question text label (e.g. "What is the value of...?") */
     #questionLabel {
-        font-size: 16px;
-        line-height: 1.5;
+        font-size: 15px;
+        line-height: 1.55;
+        color: #111;
         display: none;
     }
 
-    #questionCode {
-        background: #1e1e1e;
-        color: #d4d4d4;
-        font-family: 'Courier New', monospace;
-        font-size: 14px;
-        padding: 14px 16px;
-        border-radius: 10px;
-        text-align: left;
-        white-space: pre;
+    /* Plain question (no code) */
+    #questionText {
+        font-size: 15px;
+        line-height: 1.55;
+        color: #111;
         display: none;
+    }
+
+    /* Dark code block */
+    #questionCode {
+        display: none;
+        background: #0f1117;
+        border-radius: 10px;
+        padding: 14px 16px;
         overflow-x: auto;
     }
 
-    #questionText {
-        font-size: 16px;
-        line-height: 1.5;
-        display: none;
+    #questionCode code {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 13.5px;
+        color: #e2e8f0;
+        white-space: pre;
+        line-height: 1.65;
+        display: block;
     }
 
+    /* Answer buttons grid */
     .but {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: 10px;
     }
 
     .but button {
         background-color: white;
-        padding: 16px 10px;
-        border: none;
+        padding: 14px 10px;
+        border: 2px solid transparent;
         border-radius: 10px;
         cursor: pointer;
         transition: 0.2s;
         font-size: 13px;
         line-height: 1.4;
-        min-height: 60px;
+        min-height: 56px;
         display: flex;
         align-items: center;
         justify-content: center;
         word-break: break-word;
+        text-align: center;
+        font-family: Arial, sans-serif;
     }
 
-    .but button:hover { background-color: #ddd; }
-    .result { font-weight: bold; font-size: 16px; }
+    .but button:hover:not(:disabled) { background-color: #f0f0f0; }
+
+    .result {
+        font-weight: bold;
+        font-size: 15px;
+        min-height: 22px;
+    }
 
     .next-btn {
-        padding: 14px;
+        padding: 13px;
         border: none;
         width: 100%;
-        border-radius: 8px;
+        border-radius: 10px;
         background-color: #FF4800;
         color: white;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 15px;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
         visibility: hidden;
+        transition: 0.2s;
     }
+    .next-btn:hover { opacity: 0.88; }
 
-    .progress-bar-wrap {
-        background: #ddd;
-        border-radius: 10px;
-        height: 8px;
-        width: 70%;
-    }
-
-    .progress-bar {
-        height: 8px;
-        border-radius: 10px;
-        background: #FF4800;
-        transition: width 0.4s ease;
-    }
-
+    /* Final screen */
     .finalResult {
-        display: flex;
+        display: none;
         flex-direction: column;
         align-items: center;
         gap: 16px;
-        font-size: 20px;
-        font-weight: bold;
+        text-align: center;
+        padding: 10px 0;
     }
 
-    .btn-row {
+    .final-score {
+        font-size: 36px;
+        font-weight: bold;
+        color: #111;
+    }
+
+    .final-sub {
+        font-size: 13px;
+        color: #666;
+        font-weight: normal;
+        margin-top: -6px;
+    }
+
+    .breakdown {
         display: flex;
-        gap: 12px;
+        gap: 8px;
         flex-wrap: wrap;
         justify-content: center;
     }
 
-    .finalResult button {
-        padding: 14px 24px;
-        background-color: #FF4800;
-        border: none;
-        border-radius: 15px;
-        color: white;
-        cursor: pointer;
-        font-size: 15px;
+    .breakdown span {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .pill-easy   { background: #dcfce7; color: #166534; }
+    .pill-medium { background: #fef9c3; color: #92400e; }
+    .pill-hard   { background: #fee2e2; color: #991b1b; }
+
+    .btn-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
-    .summary {
-        font-size: 13px;
-        color: #555;
-        font-weight: normal;
-        line-height: 1.8;
+    .btn-row button {
+        padding: 12px 20px;
+        background-color: #FF4800;
+        border: none;
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+    .btn-row button:hover { opacity: 0.88; }
+    .btn-row .btn-sec {
+        background: #ddd;
+        color: #333;
     }
 </style>
 </head>
 <body>
 
-<p class="title" id="problemNumber">Problem 1 of 10</p>
+<div class="top-bar">
+    <span class="problem-title" id="problemNumber">Problem 1 of 10</span>
+    <span class="diff-badge badge-easy" id="diffBadge">Easy</span>
+</div>
+
+<div class="progress-wrap">
+    <div class="progress-bar" id="progressBar" style="width:0%"></div>
+</div>
 
 <div class="card">
+    <div class="diff-toast" id="diffToast"></div>
+
     <div class="quizContent">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="difficulty-badge badge-easy" id="diffBadge">Easy</span>
-            <div class="progress-bar-wrap">
-                <div class="progress-bar" id="progressBar" style="width:0%"></div>
-            </div>
-        </div>
+        <!-- Question label (text part) -->
+        <p id="questionLabel"></p>
 
-        <div class="difficulty-change" id="diffChange"></div>
+        <!-- Code block -->
+        <div id="questionCode"><code id="codeContent"></code></div>
 
-        <div>
-            <p id="questionLabel"></p>
-            <pre id="questionCode"></pre>
-            <p id="questionText"></p>
-        </div>
+        <!-- Plain question (no code) -->
+        <p id="questionText"></p>
 
-        <div class="but">
+        <div class="but" style="margin-top: 12px;">
             <button onclick="checkAnswer(0)" id="btn0"></button>
             <button onclick="checkAnswer(1)" id="btn1"></button>
             <button onclick="checkAnswer(2)" id="btn2"></button>
@@ -205,24 +265,22 @@
         <p class="result" id="result"></p>
         <button class="next-btn" id="bbtn" onclick="nextQuestion()">Next →</button>
     </div>
-    <div class="finalResult" style="display:none;"></div>
+
+    <div class="finalResult" id="finalCard"></div>
 </div>
 
 <script>
     const LEVELS = ['easy', 'medium', 'hard'];
-
     const startDifficulty = localStorage.getItem("difficulty") || "easy";
     const uploadedQuiz = localStorage.getItem("uploadedQuiz");
     const isUploaded = startDifficulty === 'uploaded' && uploadedQuiz;
 
     let allQuestions = {};
     let usedIndexes = { easy: new Set(), medium: new Set(), hard: new Set() };
-    let currentDifficulty = startDifficulty;
+    let currentDifficulty = isUploaded ? 'easy' : startDifficulty;
 
-    // For uploaded quizzes — play through once in order, no repeat
     let uploadedList = [];
     let uploadedIndex = 0;
-
     let MAX_QUESTIONS = 10;
 
     let questionHistory = [];
@@ -233,13 +291,15 @@
 
     const questionLabel = document.getElementById("questionLabel");
     const questionCode  = document.getElementById("questionCode");
+    const codeContent   = document.getElementById("codeContent");
     const questionText  = document.getElementById("questionText");
     const problemNumber = document.getElementById("problemNumber");
-    const result        = document.getElementById("result");
+    const resultEl      = document.getElementById("result");
     const buttons       = document.querySelectorAll(".but button");
     const diffBadge     = document.getElementById("diffBadge");
-    const diffChange    = document.getElementById("diffChange");
+    const diffToast     = document.getElementById("diffToast");
     const progressBar   = document.getElementById("progressBar");
+    const finalCard     = document.getElementById("finalCard");
 
     function shuffle(arr) {
         const a = [...arr];
@@ -252,63 +312,65 @@
 
     function updateBadge(diff) {
         diffBadge.textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
-        diffBadge.className = 'difficulty-badge badge-' + diff;
+        diffBadge.className = 'diff-badge badge-' + diff;
     }
 
-    function showDifficultyChange(msg, type) {
-        diffChange.textContent = msg;
-        diffChange.className = 'difficulty-change ' + type;
-        diffChange.style.display = 'block';
-        setTimeout(() => { diffChange.style.display = 'none'; }, 2500);
+    function showToast(msg, type) {
+        diffToast.textContent = msg;
+        diffToast.className = 'diff-toast ' + type;
+        diffToast.style.display = 'block';
+        setTimeout(() => { diffToast.style.display = 'none'; }, 2500);
     }
 
     function getNextQuestion() {
-        // Uploaded quiz — go through list once, no repeats
         if (isUploaded) {
             if (uploadedIndex >= uploadedList.length) return null;
             return { ...uploadedList[uploadedIndex++], difficulty: 'uploaded' };
         }
-
-        // Regular quiz — adaptive
         const pool = allQuestions[currentDifficulty];
-        if (!pool || pool.length === 0) return null;
-
-        const unused = pool.map((q, i) => i).filter(i => !usedIndexes[currentDifficulty].has(i));
-
-        if (unused.length === 0) {
-            usedIndexes[currentDifficulty].clear();
-            return getNextQuestion();
-        }
-
+        if (!pool || !pool.length) return null;
+        let unused = pool.map((q, i) => i).filter(i => !usedIndexes[currentDifficulty].has(i));
+        if (!unused.length) { usedIndexes[currentDifficulty].clear(); return getNextQuestion(); }
         const idx = unused[Math.floor(Math.random() * unused.length)];
         usedIndexes[currentDifficulty].add(idx);
         return { ...pool[idx], difficulty: currentDifficulty };
     }
 
     function adjustDifficulty(wasCorrect) {
-        if (isUploaded) return; // No adaptive for uploaded quizzes
-
+        if (isUploaded) return;
         streak = wasCorrect ? (streak > 0 ? streak + 1 : 1) : (streak < 0 ? streak - 1 : -1);
-
-        const currentLevel = LEVELS.indexOf(currentDifficulty);
-
-        if (streak >= 3 && currentLevel < 2) {
-            currentDifficulty = LEVELS[currentLevel + 1];
-            streak = 0;
+        const lvl = LEVELS.indexOf(currentDifficulty);
+        if (streak >= 3 && lvl < 2) {
+            currentDifficulty = LEVELS[lvl + 1]; streak = 0;
             updateBadge(currentDifficulty);
-            showDifficultyChange('Nice streak! Moving to ' + currentDifficulty, 'up');
-        } else if (streak <= -2 && currentLevel > 0) {
-            currentDifficulty = LEVELS[currentLevel - 1];
-            streak = 0;
+            showToast('Nice streak! Moving to ' + currentDifficulty, 'toast-up');
+        } else if (streak <= -2 && lvl > 0) {
+            currentDifficulty = LEVELS[lvl - 1]; streak = 0;
             updateBadge(currentDifficulty);
-            showDifficultyChange('Adjusting to ' + currentDifficulty, 'down');
+            showToast('Adjusting to ' + currentDifficulty, 'toast-down');
         }
+    }
+
+    // Detect if a line looks like code
+    function isCodeLine(line) {
+        const t = line.trim();
+        return (
+            /[{};]/.test(t) ||
+            /\b(int|float|double|char|string|bool|void|cout|cin|return|for|while|if|else|class|struct|include|using|namespace|auto|const|endl)\b/.test(t) ||
+            /[+\-*/%]=?/.test(t) ||
+            /<<|>>|\+\+|--|&&|\|\|/.test(t) ||
+            /^\s*#/.test(t) ||
+            /\(.*\)/.test(t)
+        );
     }
 
     function renderQuestion(q) {
         questionLabel.style.display = 'none';
         questionCode.style.display  = 'none';
         questionText.style.display  = 'none';
+        codeContent.textContent = '';
+        questionLabel.textContent = '';
+        questionText.textContent = '';
 
         const raw = q.question;
 
@@ -317,40 +379,51 @@
             const codeLines = [], labelLines = [];
             parts.forEach(line => {
                 const t = line.trim();
-                if (/[{};=<>!+\-*/%]/.test(t) || /^\s*(int|float|double|char|string|cout|cin|for|while|if)\b/.test(t)) {
-                    codeLines.push(t);
-                } else if (t.length > 0) {
-                    labelLines.push(t);
-                }
+                if (!t) return;
+                if (isCodeLine(t)) codeLines.push(t);
+                else labelLines.push(t);
             });
-            if (codeLines.length) { questionCode.textContent = codeLines.join('\n'); questionCode.style.display = 'block'; }
-            if (labelLines.length) { questionLabel.textContent = labelLines.join(' '); questionLabel.style.display = 'block'; }
+            if (codeLines.length) {
+                codeContent.textContent = codeLines.join('\n');
+                questionCode.style.display = 'block';
+            }
+            if (labelLines.length) {
+                questionLabel.textContent = labelLines.join(' ');
+                questionLabel.style.display = 'block';
+            }
         } else {
-            questionText.textContent = raw;
-            questionText.style.display = 'block';
+            // Single line — check if it contains inline code patterns
+            if (isCodeLine(raw)) {
+                codeContent.textContent = raw;
+                questionCode.style.display = 'block';
+            } else {
+                questionText.textContent = raw;
+                questionText.style.display = 'block';
+            }
         }
     }
 
     function loadQuestion() {
         currentQuestion = getNextQuestion();
-        if (!currentQuestion) {
-            showFinalResult();
-            return;
-        }
+        if (!currentQuestion) { showFinalResult(); return; }
 
         questionCount++;
         problemNumber.textContent = 'Problem ' + questionCount + ' of ' + MAX_QUESTIONS;
         progressBar.style.width = ((questionCount - 1) / MAX_QUESTIONS * 100) + '%';
         if (!isUploaded) updateBadge(currentDifficulty);
+
         renderQuestion(currentQuestion);
 
         for (let i = 0; i < 4; i++) {
             buttons[i].textContent = String.fromCharCode(65 + i) + '. ' + (currentQuestion.options[i] || '');
             buttons[i].disabled = false;
             buttons[i].style.backgroundColor = 'white';
+            buttons[i].style.borderColor = 'transparent';
+            buttons[i].style.color = '#111';
         }
 
-        result.textContent = '';
+        resultEl.textContent = '';
+        resultEl.style.color = '';
         document.getElementById('bbtn').style.visibility = 'hidden';
     }
 
@@ -359,15 +432,18 @@
         const wasCorrect = selected === correctIndex;
 
         if (wasCorrect) {
-            result.textContent = 'Correct!';
-            result.style.color = 'green';
+            resultEl.textContent = 'Correct!';
+            resultEl.style.color = 'green';
             buttons[selected].style.backgroundColor = '#4CAF50';
+            buttons[selected].style.color = 'white';
             score++;
         } else {
-            result.textContent = 'Wrong!';
-            result.style.color = 'red';
+            resultEl.textContent = 'Wrong!';
+            resultEl.style.color = 'red';
             buttons[selected].style.backgroundColor = '#f44336';
+            buttons[selected].style.color = 'white';
             buttons[correctIndex].style.backgroundColor = '#4CAF50';
+            buttons[correctIndex].style.color = 'white';
         }
 
         questionHistory.push({ correct: wasCorrect, difficulty: currentQuestion.difficulty });
@@ -377,11 +453,8 @@
     }
 
     function nextQuestion() {
-        if (questionCount >= MAX_QUESTIONS) {
-            showFinalResult();
-        } else {
-            loadQuestion();
-        }
+        if (questionCount >= MAX_QUESTIONS) showFinalResult();
+        else loadQuestion();
     }
 
     async function saveScore() {
@@ -391,44 +464,41 @@
         try {
             await fetch('/api/auth/score', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                 body: JSON.stringify({ score, total: MAX_QUESTIONS, difficulty: startDifficulty })
             });
-        } catch (err) {
-            console.error('Failed to save score:', err);
-        }
+        } catch (e) { console.error(e); }
     }
 
     function showFinalResult() {
         saveScore();
         progressBar.style.width = '100%';
 
-        const breakdown = { easy: {c:0,t:0}, medium: {c:0,t:0}, hard: {c:0,t:0}, uploaded: {c:0,t:0} };
+        const breakdown = { easy:{c:0,t:0}, medium:{c:0,t:0}, hard:{c:0,t:0} };
         questionHistory.forEach(h => {
             if (!breakdown[h.difficulty]) return;
             breakdown[h.difficulty].t++;
             if (h.correct) breakdown[h.difficulty].c++;
         });
 
-        const breakdownHTML = Object.entries(breakdown)
-            .filter(([k, v]) => v.t > 0 && k !== 'uploaded')
-            .map(([k, v]) => k.charAt(0).toUpperCase() + k.slice(1) + ': ' + v.c + '/' + v.t)
-            .join(' | ');
+        const pillsHTML = Object.entries(breakdown)
+            .filter(([, v]) => v.t > 0)
+            .map(([k, v]) => `<span class="pill-${k}">${k.charAt(0).toUpperCase()+k.slice(1)}: ${v.c}/${v.t}</span>`)
+            .join('');
 
         document.querySelector('.quizContent').style.display = 'none';
-        const finalDiv = document.querySelector('.finalResult');
-        finalDiv.style.display = 'flex';
-        finalDiv.innerHTML =
-            '<p>Your final score is:<br>' + score + '/' + MAX_QUESTIONS + '</p>' +
-            (breakdownHTML ? '<p class="summary">' + breakdownHTML + '</p>' : '') +
-            '<div class="btn-row">' +
-                '<button onclick="restartQuiz()">Play Again</button>' +
-                (isUploaded ? '' : '<button onclick="location.href=\'leaderboard.html\'">🏆 Leaderboard</button>') +
-                '<button onclick="location.href=\'index.html\'">Main Menu</button>' +
-            '</div>';
+
+        finalCard.style.display = 'flex';
+        finalCard.innerHTML = `
+            <div class="final-score">${score}/${MAX_QUESTIONS}</div>
+            <div class="final-sub">Your Final Score</div>
+            ${pillsHTML ? `<div class="breakdown">${pillsHTML}</div>` : ''}
+            <div class="btn-row">
+                <button onclick="restartQuiz()">Play Again</button>
+                ${!isUploaded ? `<button onclick="location.href='leaderboard.html'">Leaderboard</button>` : ''}
+                <button class="btn-sec" onclick="location.href='index.html'">Main Menu</button>
+            </div>
+        `;
     }
 
     function restartQuiz() {
@@ -445,22 +515,14 @@
             options: q.options.map(o => o.replace(/^[A-D]\)\s*/, '')),
             correct: ['A','B','C','D'].indexOf(q.answer) !== -1 ? ['A','B','C','D'].indexOf(q.answer) : 0
         }));
-
-        // Shuffle and use all questions (no repeat), cap at 20
         uploadedList = shuffle(mapped).slice(0, 20);
         MAX_QUESTIONS = uploadedList.length;
-
-        // Hide difficulty badge for uploaded
         diffBadge.style.display = 'none';
-
         loadQuestion();
     } else {
         fetch('quiz.json')
             .then(r => r.json())
-            .then(data => {
-                allQuestions = data;
-                loadQuestion();
-            })
+            .then(data => { allQuestions = data; loadQuestion(); })
             .catch(e => console.error(e));
     }
 </script>
