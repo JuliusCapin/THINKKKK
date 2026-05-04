@@ -382,7 +382,12 @@
                 else labelLines.push(t);
             });
             if (codeLines.length) {
-                codeContent.textContent = codeLines.join('\n');
+                // Put each semicolon-separated statement on its own line
+                const formatted = codeLines.map(line => {
+                    return line.split(/; +/).filter(s => s.trim()).join(';
+');
+                }).join('\n');
+                codeContent.textContent = formatted;
                 questionCode.style.display = 'block';
             }
             if (labelLines.length) {
@@ -430,14 +435,12 @@
         const wasCorrect = selected === correctIndex;
 
         if (wasCorrect) {
-            resultEl.textContent = 'Correct!';
-            resultEl.style.color = 'green';
+            resultEl.textContent = '';
             buttons[selected].style.backgroundColor = '#4CAF50';
             buttons[selected].style.color = 'white';
             score++;
         } else {
-            resultEl.textContent = 'Wrong!';
-            resultEl.style.color = 'red';
+            resultEl.textContent = '';
             buttons[selected].style.backgroundColor = '#f44336';
             buttons[selected].style.color = 'white';
             buttons[correctIndex].style.backgroundColor = '#4CAF50';
