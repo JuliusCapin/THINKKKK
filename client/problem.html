@@ -384,8 +384,7 @@
             if (codeLines.length) {
                 // Put each semicolon-separated statement on its own line
                 const formatted = codeLines.map(line => {
-                    return line.split(/; +/).filter(s => s.trim()).join(';
-');
+                    return line.split(/; +/).filter(s => s.trim()).join(';\n');
                 }).join('\n');
                 codeContent.textContent = formatted;
                 questionCode.style.display = 'block';
