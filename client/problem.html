@@ -209,15 +209,21 @@
 </div>
 
 <script>
-    const MAX_QUESTIONS = 10;
     const LEVELS = ['easy', 'medium', 'hard'];
 
     const startDifficulty = localStorage.getItem("difficulty") || "easy";
     const uploadedQuiz = localStorage.getItem("uploadedQuiz");
+    const isUploaded = startDifficulty === 'uploaded' && uploadedQuiz;
 
     let allQuestions = {};
     let usedIndexes = { easy: new Set(), medium: new Set(), hard: new Set() };
     let currentDifficulty = startDifficulty;
+
+    // For uploaded quizzes — play through once in order, no repeat
+    let uploadedList = [];
+    let uploadedIndex = 0;
+
+    let MAX_QUESTIONS = 10;
 
     let questionHistory = [];
     let currentQuestion = null;
@@ -235,6 +241,15 @@
     const diffChange    = document.getElementById("diffChange");
     const progressBar   = document.getElementById("progressBar");
 
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
     function updateBadge(diff) {
         diffBadge.textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
         diffBadge.className = 'difficulty-badge badge-' + diff;
@@ -248,6 +263,13 @@
     }
 
     function getNextQuestion() {
+        // Uploaded quiz — go through list once, no repeats
+        if (isUploaded) {
+            if (uploadedIndex >= uploadedList.length) return null;
+            return { ...uploadedList[uploadedIndex++], difficulty: 'uploaded' };
+        }
+
+        // Regular quiz — adaptive
         const pool = allQuestions[currentDifficulty];
         if (!pool || pool.length === 0) return null;
 
@@ -264,6 +286,8 @@
     }
 
     function adjustDifficulty(wasCorrect) {
+        if (isUploaded) return; // No adaptive for uploaded quizzes
+
         streak = wasCorrect ? (streak > 0 ? streak + 1 : 1) : (streak < 0 ? streak - 1 : -1);
 
         const currentLevel = LEVELS.indexOf(currentDifficulty);
@@ -309,12 +333,15 @@
 
     function loadQuestion() {
         currentQuestion = getNextQuestion();
-        if (!currentQuestion) return;
+        if (!currentQuestion) {
+            showFinalResult();
+            return;
+        }
 
         questionCount++;
         problemNumber.textContent = 'Problem ' + questionCount + ' of ' + MAX_QUESTIONS;
         progressBar.style.width = ((questionCount - 1) / MAX_QUESTIONS * 100) + '%';
-        updateBadge(currentDifficulty);
+        if (!isUploaded) updateBadge(currentDifficulty);
         renderQuestion(currentQuestion);
 
         for (let i = 0; i < 4; i++) {
@@ -358,7 +385,7 @@
     }
 
     async function saveScore() {
-        if (startDifficulty === 'uploaded') return;
+        if (isUploaded) return;
         const token = localStorage.getItem('token');
         if (!token) return;
         try {
@@ -379,15 +406,16 @@
         saveScore();
         progressBar.style.width = '100%';
 
-        const breakdown = { easy: {c:0,t:0}, medium: {c:0,t:0}, hard: {c:0,t:0} };
+        const breakdown = { easy: {c:0,t:0}, medium: {c:0,t:0}, hard: {c:0,t:0}, uploaded: {c:0,t:0} };
         questionHistory.forEach(h => {
+            if (!breakdown[h.difficulty]) return;
             breakdown[h.difficulty].t++;
             if (h.correct) breakdown[h.difficulty].c++;
         });
 
         const breakdownHTML = Object.entries(breakdown)
-            .filter(([,v]) => v.t > 0)
-            .map(([k,v]) => k.charAt(0).toUpperCase() + k.slice(1) + ': ' + v.c + '/' + v.t)
+            .filter(([k, v]) => v.t > 0 && k !== 'uploaded')
+            .map(([k, v]) => k.charAt(0).toUpperCase() + k.slice(1) + ': ' + v.c + '/' + v.t)
             .join(' | ');
 
         document.querySelector('.quizContent').style.display = 'none';
@@ -395,10 +423,10 @@
         finalDiv.style.display = 'flex';
         finalDiv.innerHTML =
             '<p>Your final score is:<br>' + score + '/' + MAX_QUESTIONS + '</p>' +
-            '<p class="summary">' + breakdownHTML + '</p>' +
+            (breakdownHTML ? '<p class="summary">' + breakdownHTML + '</p>' : '') +
             '<div class="btn-row">' +
                 '<button onclick="restartQuiz()">Play Again</button>' +
-                '<button onclick="location.href=\'leaderboard.html\'">🏆 Leaderboard</button>' +
+                (isUploaded ? '' : '<button onclick="location.href=\'leaderboard.html\'">🏆 Leaderboard</button>') +
                 '<button onclick="location.href=\'index.html\'">Main Menu</button>' +
             '</div>';
     }
@@ -406,19 +434,25 @@
     function restartQuiz() {
         localStorage.removeItem('uploadedQuiz');
         localStorage.removeItem('difficulty');
-        window.location.href = 'difficulty.html';
+        window.location.href = isUploaded ? 'upload.html' : 'difficulty.html';
     }
 
     // Init
-    if (startDifficulty === 'uploaded' && uploadedQuiz) {
+    if (isUploaded) {
         const parsed = JSON.parse(uploadedQuiz);
         const mapped = parsed.map(q => ({
             question: q.question,
             options: q.options.map(o => o.replace(/^[A-D]\)\s*/, '')),
             correct: ['A','B','C','D'].indexOf(q.answer) !== -1 ? ['A','B','C','D'].indexOf(q.answer) : 0
         }));
-        allQuestions = { easy: mapped, medium: mapped, hard: mapped };
-        currentDifficulty = 'easy';
+
+        // Shuffle and use all questions (no repeat), cap at 20
+        uploadedList = shuffle(mapped).slice(0, 20);
+        MAX_QUESTIONS = uploadedList.length;
+
+        // Hide difficulty badge for uploaded
+        diffBadge.style.display = 'none';
+
         loadQuestion();
     } else {
         fetch('quiz.json')
