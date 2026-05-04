@@ -354,14 +354,12 @@
     // Detect if a line looks like code
     function isCodeLine(line) {
         const t = line.trim();
-        return (
-            /[{};]/.test(t) ||
-            /\b(int|float|double|char|string|bool|void|cout|cin|return|for|while|if|else|class|struct|include|using|namespace|auto|const|endl)\b/.test(t) ||
-            /[+\-*/%]=?/.test(t) ||
-            /<<|>>|\+\+|--|&&|\|\|/.test(t) ||
-            /^\s*#/.test(t) ||
-            /\(.*\)/.test(t)
-        );
+        // Plain English sentences are NOT code
+        if (/^(What|Which|How|Why|When|Who|Is|Are|Does|Do|The|A |An )/i.test(t)) return false;
+        // Must have clear C++ indicators
+        const hasKeyword = /\b(int|float|double|char|string|bool|void|cout|cin|return|for|while|class|struct|include|using|namespace|endl|auto|const)\b/.test(t);
+        const hasOperator = /<<|>>|\+\+|--|[{}]|;\s|;$/.test(t);
+        return hasKeyword || hasOperator;
     }
 
     function renderQuestion(q) {
