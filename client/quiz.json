@@ -88,7 +88,7 @@
                 "scan",
                 "print"
             ],
-            "correct": 3
+            "correct": 0
         },
         {
             "question": "Which operator is used for assignment in C++?",
